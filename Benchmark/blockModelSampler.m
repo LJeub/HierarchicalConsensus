@@ -32,10 +32,10 @@ function A=blockModelSampler(W,S,k)
 %
 % See also hierarchicalBenchmark
 
-% Version:
-% Date:
-% Author:
-% Email:
+% Version: 1.0
+% Date: Thu Oct  5 17:09:19 EDT 2017
+% Author: Lucas Jeub
+% Email: ljeub@iu.edu
 
 max_reject=100;
 n_nodes=numel(S);

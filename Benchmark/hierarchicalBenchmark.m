@@ -77,10 +77,10 @@ function [A,S]=hierarchicalBenchmark(n,p,varargin)
 %
 % See also dirchletSampler, powerlawSampler, blockModelSampler
 
-% Version:
-% Date:
-% Author:
-% Email:
+% Version: 1.0
+% Date: Thu Oct  5 17:09:19 EDT 2017
+% Author: Lucas Jeub
+% Email: ljeub@iu.edu
 
 parseArgs=inputParser();
 addParameter(parseArgs,'SplitDistribution',@() max(2,poissrnd(4)));

@@ -28,10 +28,10 @@ function s=hierarchicalSort(C)
 %
 % See also treeSort, drawHierarchy, consensusPlot
 
-% Version:
-% Date:
-% Author:
-% Email:
+% Version: 1.0
+% Date: Thu Oct  5 17:09:19 EDT 2017
+% Author: Lucas Jeub
+% Email: ljeub@iu.edu
 
 % shortcut for single element input
 if numel(C)==1

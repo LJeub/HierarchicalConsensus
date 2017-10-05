@@ -53,10 +53,10 @@ function P=sampleApprox(alpha,mu,n_samples)
 %
 % See Also normApprox, localPermModel, permModel, hierarchicalConsensus
 
-% Version:
-% Date:
-% Author:
-% Email:
+% Version: 1.0
+% Date: Thu Oct  5 17:09:20 EDT 2017
+% Author: Lucas Jeub
+% Email: ljeub@iu.edu
 
 if nargin<3
     n_samples=10000;

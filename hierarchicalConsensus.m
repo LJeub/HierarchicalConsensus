@@ -89,10 +89,10 @@ function [Sc,Tree]=hierarchicalConsensus(Ssample,varargin)
 % See Also eventSamples, drawHierarchy, consensusPlot, coclassificationMatrix,
 % allPartitions, localPermModel, permModel, normApprox, sampleApprox
 
-% Version:
-% Date:
-% Author:
-% Email:
+% Version: 1.0
+% Date: Thu Oct  5 17:09:19 EDT 2017
+% Author: Lucas Jeub
+% Email: ljeub@iu.edu
 
 [N,L]=size(Ssample);
 

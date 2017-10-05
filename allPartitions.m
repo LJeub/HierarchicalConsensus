@@ -37,10 +37,10 @@ function [Sall,p]=allPartitions(Sc,Tree)
 %
 % See also hierarchicalConsensus
 
-% Version:
-% Date:
-% Author:
-% Email:
+% Version: 1.0
+% Date: Thu Oct  5 17:09:19 EDT 2017
+% Author: Lucas Jeub
+% Email: ljeub@iu.edu
 
 if isempty(Tree)
     Sall=Sc;

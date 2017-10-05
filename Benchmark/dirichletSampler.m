@@ -32,10 +32,10 @@ function weights=dirichletSampler(theta,nc)
 %
 % See also hierarchicalBenchmark
 
-% Version: 
-% Date: 
-% Author: 
-% Email: 
+% Version: 1.0
+% Date: Thu Oct  5 17:09:19 EDT 2017
+% Author: Lucas Jeub
+% Email: ljeub@iu.edu
 
 weights=gamrnd(theta,1,nc,1);
 weights=weights./sum(weights);

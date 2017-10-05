@@ -28,10 +28,10 @@ function C=coclassificationMatrix(S)
 %
 % See also hierarchicalConsensus
 
-% Version:
-% Date:
-% Author:
-% Email:
+% Version: 1.0
+% Date: Thu Oct  5 17:09:19 EDT 2017
+% Author: Lucas Jeub
+% Email: ljeub@iu.edu
 
 % identify unique rows
 [N,L]=size(S);

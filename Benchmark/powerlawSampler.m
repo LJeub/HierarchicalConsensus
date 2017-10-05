@@ -35,10 +35,10 @@ function x=powerlawSampler(n,t,x_min,x_max)
 %
 % See also hierachicalBenchmark
 
-% Version: 
-% Date:
-% Author:
-% Email:
+% Version: 1.0
+% Date: Thu Oct  5 17:09:19 EDT 2017
+% Author: Lucas Jeub
+% Email: ljeub@iu.edu
 
 y=rand(n,1);
 if t~=-1

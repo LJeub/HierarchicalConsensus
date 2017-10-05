@@ -43,10 +43,10 @@ function drawHierarchy(Sc,Tree,varargin)
 %
 % See also consensusPlot
 
-% Version:
-% Date:
-% Author:
-% Email:
+% Version: 1.0
+% Date: Thu Oct  5 17:09:19 EDT 2017
+% Author: Lucas Jeub
+% Email: ljeub@iu.edu
 
 N=size(Sc,1);
 parseArgs=inputParser();

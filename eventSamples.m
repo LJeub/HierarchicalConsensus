@@ -66,10 +66,10 @@ function [S,gammas]=eventSamples(A,n,varargin)
 %
 % See Also hierarchicalConsensus, exponentialSamples
 
-% Version:
-% Date:
-% Author:
-% Email:
+% Version: 1.0
+% Date: Thu Oct  5 17:09:19 EDT 2017
+% Author: Lucas Jeub
+% Email: ljeub@iu.edu
 
 parseArgs=inputParser();
 checkFunction=@(x) isa(x,'function_handle');

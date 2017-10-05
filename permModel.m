@@ -30,10 +30,10 @@ function mu=permModel(S)
 %
 % See Also hierarchicalConsensus, localPermModel, normApprox, sampleApprox
 
-% Version:
-% Date:
-% Author:
-% Email:
+% Version: 1.0
+% Date: Thu Oct  5 17:09:20 EDT 2017
+% Author: Lucas Jeub
+% Email: ljeub@iu.edu
 
 [N,L]=size(S);
 C=max(S(:));

@@ -56,10 +56,10 @@ function [ax_C_int,ax_H_int]=consensusPlot(C,Sc,Tree,varargin)
 %
 % See also hierachicalConsensus, drawHierarchy
 
-% Version:
-% Date:
-% Author:
-% Email:
+% Version: 1.0
+% Date: Thu Oct  5 17:09:19 EDT 2017
+% Author: Lucas Jeub
+% Email: ljeub@iu.edu
 
 
 parseArgs=inputParser();

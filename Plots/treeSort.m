@@ -32,10 +32,10 @@ function s=treeSort(C,Sc,Tree)
 % See also hierarchicalSort, drawHierarchy, consensusPlot,
 % hierarchicalConsensus
 
-% Version:
-% Date:
-% Author:
-% Email:
+% Version: 1.0
+% Date: Thu Oct  5 17:09:19 EDT 2017
+% Author: Lucas Jeub
+% Email: ljeub@iu.edu
 
 % encode parents
 if isempty(Tree)

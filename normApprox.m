@@ -47,10 +47,10 @@ function P=normApprox(alpha,mu)
 %
 % See Also sampleApprox, localPermModel, permModel, hierarchicalConsensus
 
-% Version:
-% Date:
-% Author:
-% Email:
+% Version: 1.0
+% Date: Thu Oct  5 17:09:19 EDT 2017
+% Author: Lucas Jeub
+% Email: ljeub@iu.edu
 
 [N,L]=size(mu);
 p=zeros(N,1);
