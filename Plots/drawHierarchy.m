@@ -81,7 +81,7 @@ switch options.Orientation
     case 'vertical'
         set(options.Axes,'xdir','reverse')
         draw_base=@(x,w,h) patch(options.Axes,[1,1,1-h],[x-w/2,x+w/2,x],options.Color,'LineStyle','none');
-        draw_join=@(x1,x2,y1,y2) line(options.Axes,[y1,y2,y2],[x1,x1,x2],'color',options.Color,'LineWidth',options.linewidth);
+        draw_join=@(x1,x2,y1,y2) line(options.Axes,[y1,y2,y2],[x1,x1,x2],'color',options.Color,'LineWidth',options.LineWidth);
     otherwise
         error('unknown value for option orientation')
 end
