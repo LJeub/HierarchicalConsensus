@@ -39,7 +39,7 @@ For a different significance level `alpha` use
 
 	[Sc, Tree] = hierarchicalConsensus(S, alpha);
 	
-For more details other optional parameters see `help(hierarchicalConsensus)`.
+For more details other optional parameters see `help('hierarchicalConsensus')`.
 
 Compute all cuts of the consensus hierarchy for further analysis:
 	
@@ -64,7 +64,7 @@ Generate adjacency matrix `A` and ground truth partitions `Sgtruth`:
 
 	[A, Sgtruth] = hierarchicalBenchmark(n, p)
 	
-where `n` is the number of nodes in the network. For more customization options see `help(hierarchicalBenchmark)`.
+where `n` is the number of nodes in the network. For more customization options see `help('hierarchicalBenchmark')`.
 
 
 ## Example
