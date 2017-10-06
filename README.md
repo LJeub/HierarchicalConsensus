@@ -10,7 +10,7 @@ Lucas G. S. Jeub, Olaf Sporns, and Santo Fortunato
 Please cite this paper and include a link to https://github.com/LJeub/HierarchicalConsensus if you include results based on this code in an academic publication.
 
 
-## Instalation 
+## Installation 
 
 Download the latest version of the code [here](https://github.com/LJeub/HierarchicalConsensus/releases/latest) and add it to your MATLAB path. By default the code relies on [GenLouvain](http://netwiki.amath.unc.edu/GenLouvain/GenLouvain) to identify community structure. To use the code with default options make sure GenLouvain is installed on your MATLAB path (more information is available on the [GenLouvain GitHub page](https://github.com/GenLouvain/GenLouvain)). 
 
