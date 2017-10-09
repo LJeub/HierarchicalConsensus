@@ -5,7 +5,7 @@ This code implements the hierarchical consensus clustering method introduced in
 
 **Multiresolution Consensus Clustering in Networks**  
 Lucas G. S. Jeub, Olaf Sporns, and Santo Fortunato  
-[arXiv:xxxx.xxxx](http://arxiv.com/)
+[arXiv:1710.02249](https://arxiv.org/abs/1710.02249)
 
 Please cite this paper and include a link to https://github.com/LJeub/HierarchicalConsensus if you include results based on this code in an academic publication.
 
