@@ -17,7 +17,7 @@ Download the latest version of the code [here](https://github.com/LJeub/Hierarch
 
 ## Usage
 
-This section gives a brief overview of the different functions included in this package. For more details see use `help('function')` or `doc('function')`. The explanations below assume that we are given a network with adjacency matrix `A` as either a full or sparse matrix.
+This section gives a brief overview of the different functions included in this package. For more details use `help('function')` or `doc('function')`. The explanations below assume that we are given a network with adjacency matrix `A` as either a full or sparse matrix.
 
 #### Generate initial ensemble
 
