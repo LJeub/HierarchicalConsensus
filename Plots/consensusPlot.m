@@ -1,4 +1,4 @@
-function [ax_C_int,ax_H_int]=consensusPlot(C,Sc,Tree,varargin)
+function [ax_C,ax_H]=consensusPlot(C,Sc,Tree,varargin)
 % consensusPlot Plot hierarchical consensus clustering results
 %
 % Syntax
@@ -111,3 +111,4 @@ if nargout>0
     ax_H=ax_H_int;
 end
 end
+
