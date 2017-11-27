@@ -88,8 +88,11 @@ gamma_max=max(max(div_0((A+A')/2,((A+A')/2-modularity(A,1)))));
 
 % bisection search to find gamma_min
 a=bound;
-b=gamma_max;
+b=1;
 check=@(gamma) max(optimizer(mod_fun(A,gamma)))>nc_min;
+while ~check(b)
+    b=2*b;
+end
 if check(a)
     gamma_min=a;
 else
