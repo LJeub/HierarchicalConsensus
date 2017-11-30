@@ -96,6 +96,7 @@ for j=1:size(Sgtruth,2)
         gtruthcolors=lines(max(Sgtruth(:)));
     else
         gtruthcolors=parula(max(Sgtruth(:)));
+        gtruthcolors=gtruthcolors(randperm(size(gtruthcolors,1)),:);
     end
     for i=1:N
         imdata(i,j,:)=gtruthcolors(Sgtruth(s_int(i),j),:);
