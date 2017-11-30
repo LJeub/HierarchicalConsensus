@@ -1,4 +1,4 @@
-function drawHierarchy(Sc,Tree,varargin)
+function s=drawHierarchy(Sc,Tree,varargin)
 % drawHierarchy Draw dendrogram for a hierarchical Tree
 %
 % Syntax
@@ -68,7 +68,8 @@ if isempty(Tree)
     v_order=1;
 else
 % sort tree nodes
-A=sparse(Tree(:,1),Tree(:,2),Tree(:,3),max(Sc),max(Sc));
+W=sparse(Tree(:,1),Tree(:,2),Tree(:,3),max(Sc),max(Sc));
+A=sparse(Tree(:,1),Tree(:,2),1,max(Sc),max(Sc));
 G=digraph(Tree(:,1),Tree(:,2));
 v_order=dfsearch(G,1);
 v_order=v_order(:)';
@@ -103,14 +104,16 @@ for i=v_order(end:-1:1)
             x(i)=mean(x_base(mm));
         else
             x(i)=pos+1+length(mm)/2;
-            s(mm)=pos+(1:length(mm));
+            s(pos+(1:length(mm)))=mm;
             pos=pos+length(mm);
         end
-        draw_base(x(i),length(mm),min((1-mean(A(A(:,i)~=0,i)))/2,0.1));
+        parent=find(A(:,i));
+        v=min(W(parent,A(parent,:)~=0));
+        draw_base(x(i),length(mm),min((1-v),0.1));
         %patch([x(i)-length(mm)/2+0.5,x(i)+length(mm)/2-0.5,x(i)],[1,1,(y(i)+mean(A(A(:,i)~=0,i)))/2],lines(1));
     else
         x(i)=mean(x(ind));
-        y(i)=mean(A(i,ind));
+        y(i)=min(W(i,ind));
         for j=ind(:)'
             draw_join(x(j),x(i),y(j),y(i));
             %line([x(j),x(j)],[y(j),y(i)]);
