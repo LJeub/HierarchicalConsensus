@@ -1,5 +1,5 @@
 function [S,gammas]=exponentialSamples(A,n,varargin)
-% exponentialSamples Compute multiresolution ensemble using event sampling.
+% exponentialSamples Compute multiresolution ensemble using exponential sampling.
 %
 % Syntax
 %__________________________________________________________________________
@@ -12,8 +12,8 @@ function [S,gammas]=exponentialSamples(A,n,varargin)
 % Description
 %__________________________________________________________________________
 %
-%   [S,gammas]=exponentialSamples(A,n) computes event sampling ensemble with 'n'
-%       partitions.
+%   [S,gammas]=exponentialSamples(A,n) computes exponential sampling 
+%       ensemble with 'n' partitions.
 %
 %   [S,gammas]=exponentialSamples(__,Name,Value) additionally customizes the
 %       behavior of the function by e.g. using a different algorithm to
