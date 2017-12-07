@@ -55,7 +55,18 @@ for i=1:size(Tree,1)
         Sall(:,end+1)=Sc;
         p(end+1)=Tree(i,3);
     end
-    Sc(Sc==Tree(i,2))=Tree(i,1);
+    ind=find(Sc==Tree(i,2));
+    if isempty(ind)
+        merge_ahead=find(Tree(i+1:end,1)==Tree(i,2));
+        if ~isempty(merge_ahead)
+            warning('linkage distance inconsistent with hierarchy, a level has been collapsed');
+            for j=1:length(merge_ahead)
+                Sc(Sc==Tree(merge_ahead(j)+i,2))=Tree(i,1);
+            end
+        end
+    else
+        Sc(ind)=Tree(i,1);
+    end
 end
 end
 Sall(:,end+1)=Sc;
