@@ -60,10 +60,11 @@ else
             p(end)=Tree(i+1,3);
         end
     end
+    Sc=merge(Sc,Tree(end,:));
+    Sall(:,end+1)=Sc;
+    p(end+1)=0;
 end
-Sc=merge(Sc,Tree(end,:));
-Sall(:,end+1)=Sc;
-p(end+1)=0;
+
 end
 
 function Sc=merge(Sc, Tree)
