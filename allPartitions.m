@@ -10,7 +10,7 @@ function [Sall,p]=allPartitions(Sc,Tree)
 %__________________________________________________________________________
 %
 %   [Sall,p]=allPartitions(Sc,Tree) computes all cuts of a hierarchical
-%       tree (e.g. based the output of hierarchicalConsensus). 
+%       tree (e.g. based the output of hierarchicalConsensus).
 %
 % Input Arguments
 %__________________________________________________________________________
@@ -46,30 +46,54 @@ if isempty(Tree)
     Sall=Sc;
     p=0;
 else
-[~,s]=sort(Tree(:,3),'descend');
-Tree=Tree(s,:);
-Sall=Sc;
-p(1)=Tree(1,3);
-for i=1:size(Tree,1)
-    if ~isequal(Tree(i,3),p(end))
-        Sall(:,end+1)=Sc;
-        p(end+1)=Tree(i,3);
-    end
-    ind=find(Sc==Tree(i,2));
-    if isempty(ind)
-        merge_ahead=find(Tree(i+1:end,1)==Tree(i,2));
-        if ~isempty(merge_ahead)
-            warning('linkage distance inconsistent with hierarchy, a level has been collapsed');
-            for j=1:length(merge_ahead)
-                Sc(Sc==Tree(merge_ahead(j)+i,2))=Tree(i,1);
-            end
+    Tree=sort_tree(Tree);
+    Sall=Sc;
+    p(1)=Tree(1,3);
+    for i=1:size(Tree,1)-1
+        Sc=merge(Sc,Tree(i:end,:));
+        skipped = isequal(Sc,Sall(:,end));
+        if ~isequal(Tree(i+1,3),p(end)) && ~skipped
+            Sall(:,end+1)=Sc;
+            p(end+1)=Tree(i+1,3);
         end
-    else
-        Sc(ind)=Tree(i,1);
+        if skipped
+            p(end)=Tree(i+1,3);
+        end
     end
 end
-end
+Sc=merge(Sc,Tree(end,:));
 Sall(:,end+1)=Sc;
 p(end+1)=0;
 end
-    
+
+function Sc=merge(Sc, Tree)
+ind=find(Sc==Tree(1,2));
+if isempty(ind)
+    merge_ahead=find(Tree(:,1)==Tree(1,2));
+    if ~isempty(merge_ahead)
+        warning('linkage distance inconsistent with hierarchy, a level has been collapsed');
+        for j=1:length(merge_ahead)
+            Sc=merge(Sc,Tree(merge_ahead(j):end,:));
+        end
+        ind=find(Sc==Tree(1,2));
+    end
+end
+Sc(ind)=Tree(1,1);
+end
+
+function Tree=sort_tree(Tree)
+% make sure that merges to the same group have the same distance value
+[g,~,e]=unique(Tree(:,1));
+G=sparse(1:size(Tree,1),e,true);
+for i=1:size(G,2)
+    if length(unique(Tree(G(:,i),3)))>1
+        warning('merge distance not consistent for group %u and has been fixed by averaging',g(i))
+        Tree(G(:,i),3)=mean(Tree(G(:,i),3));
+    end
+end
+% sort tree
+[~,s]=sort(Tree(:,3),'Descend');
+Tree=Tree(s,:);
+end
+
+
