@@ -150,6 +150,7 @@ while coms_new~=coms
     G=sparse(1:N,Sc,true);
     coms_new=coms;
     mydisp(sprintf('level %u:',level));
+    mydisp(sprintf('splitting %u new communities:',coms_new-coms_old));
     for i=coms_old+1:size(G,2)
         ind=find(G(:,i));
         if length(ind)>1
@@ -183,14 +184,13 @@ while coms_new~=coms
             if max(Sc_it)>1
                 Sc(ind)=Sc_it+coms;
                 B=A(ind,ind);
-                val=0;
+                val=inf;
                 c_it=max(Sc_it);
                 for c=1:c_it
                     %Tree(end+1,:)=[i,c+coms,mean(p(:))];
                     val_it=B(Sc_it==c,Sc_it~=c);
-                    val=val + mean(val_it(:));
+                    val=min(val,min(val_it(:)));
                 end
-                val=val/c_it;
                 Tree(end+(1:c_it),:)=[repmat(i,c_it,1),coms+(1:c_it)',repmat(val,c_it,1)];
                 coms=coms+max(Sc_it);
                 mydisp(sprintf('split com %u into %u coms',i-coms_old,max(Sc_it)))
