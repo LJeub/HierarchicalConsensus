@@ -93,8 +93,8 @@ for i=1:size(G,2)
     end
 end
 % sort tree
-[~,s]=sort(Tree(:,3),'Descend');
-Tree=Tree(s,:);
+[~,s]=sortrows(Tree(:,3));
+Tree=Tree(s(end:-1:1),:);
 end
 
 
