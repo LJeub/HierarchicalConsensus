@@ -49,12 +49,18 @@ else
     Tree=sort_tree(Tree);
     Sall=Sc;
     p(1)=Tree(1,3);
+    com=Tree(1,1);
     for i=1:size(Tree,1)-1
         Sc=merge(Sc,Tree(i:end,:));
         skipped = isequal(Sc,Sall(:,end));
-        if ~isequal(Tree(i+1,3),p(end)) && ~skipped
-            Sall(:,end+1)=Sc;
-            p(end+1)=Tree(i+1,3);
+        if ~isequal(Tree(i+1,1),com) && ~skipped
+            if p(end)<Tree(i+1,3)
+                Sall(:,end+1)=Sc;
+                p(end+1)=Tree(i+1,3);
+            else
+                warning('Similarity weakly inconsistent with hierarchy, a level has been collapsed')
+            end
+            com=Tree(i+1,1);
         end
         if skipped
             p(end)=Tree(i+1,3);
@@ -72,7 +78,7 @@ ind=find(Sc==Tree(1,2));
 if isempty(ind)
     merge_ahead=find(Tree(:,1)==Tree(1,2));
     if ~isempty(merge_ahead)
-        warning('linkage distance inconsistent with hierarchy, a level has been collapsed');
+        warning('Similarity inconsistent with hierarchy, a level has been collapsed');
         for j=1:length(merge_ahead)
             Sc=merge(Sc,Tree(merge_ahead(j):end,:));
         end
@@ -92,8 +98,8 @@ for i=1:size(G,2)
         Tree(G(:,i),3)=mean(Tree(G(:,i),3));
     end
 end
-% sort tree
-[~,s]=sortrows(Tree(:,3));
+% sort tree (make sure merges to the same group are consecutive)
+[~,s]=sortrows(Tree(:,[3,1]));
 Tree=Tree(s(end:-1:1),:);
 end
 
