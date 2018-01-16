@@ -58,8 +58,8 @@ function S=fixedResSamples(A,n,varargin)
 %
 % See Also hierarchicalConsensus, eventSamples, exponentialSamples
 
-% Version: 1.0
-% Date: Thu Oct  5 17:09:19 EDT 2017
+% Version: 1.1-alpha1
+% Date: Tue Jan 16 18:15:02 EST 2018
 % Author: Lucas Jeub
 % Email: ljeub@iu.edu
 
