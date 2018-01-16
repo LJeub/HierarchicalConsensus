@@ -81,10 +81,8 @@ function [Sc,Tree]=hierarchicalConsensus(Ssample,varargin)
 %           reconstruct coarser clusters. Tree is a matrix where each row
 %           represents an edge of the tree. The first element of a row
 %           gives the index of the coarse cluster that the finer cluster
-%           given by the second element is merged into. The third element
-%           stores the average value of the null model that resulted in the
-%           split of the cluster.
-%           matrix (m x 3)
+%           given by the second element is merged into. 
+%           matrix (m x 2)
 %
 % See Also eventSamples, drawHierarchy, consensusPlot, coclassificationMatrix,
 % allPartitions, localPermModel, permModel, normApprox, sampleApprox
@@ -183,21 +181,11 @@ while coms_new~=coms
 
             if max(Sc_it)>1
                 Sc(ind)=Sc_it+coms;
-                % % use null model:
-                % val=min(p(:));
-                
-                % use minimum of coclassification matrix:
-                B=A(ind,ind);
-                val=inf;
                 c_it=max(Sc_it);
-                for c=1:c_it
-                    val_it=B(Sc_it==c,Sc_it~=c);
-                    val=min(val,min(val_it(:)));
-                end
 
                 % update tree
-                Tree(end+(1:c_it),:)=[repmat(i,c_it,1),coms+(1:c_it)',repmat(val,c_it,1)];
-                coms=coms+max(Sc_it);
+                Tree(end+(1:c_it),:)=[repmat(i,c_it,1),coms+(1:c_it)'];
+                coms=coms+c_it;
                 mydisp(sprintf('split com %u into %u coms',i-coms_old,max(Sc_it)))
             end
         end
