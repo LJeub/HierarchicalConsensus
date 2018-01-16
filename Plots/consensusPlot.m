@@ -1,4 +1,4 @@
-function [ax_C,ax_H]=consensusPlot(C,Sc,Tree,varargin)
+function [ax_C,ax_H,order]=consensusPlot(C,Sc,Tree,varargin)
 % consensusPlot Plot hierarchical consensus clustering results
 %
 % Syntax
@@ -110,6 +110,7 @@ set(ax_H_int,'ytick',[],'ydir','reverse');
 if nargout>0
     ax_C=ax_C_int;
     ax_H=ax_H_int;
+    order=s_int;
 end
 end
 
