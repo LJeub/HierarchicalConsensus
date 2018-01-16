@@ -47,13 +47,10 @@ function [S,gammas]=eventSamples(A,n,varargin)
 %                   'P'.
 %                   @modularity (default) | function handle
 %
-%   'Accuracy' -- Error tolerance for the bisection search used to find
-%                 'gamma_min' the smallest value of 'gamma' for which the
-%                 network is first partitioned into communities.
-%                 1/n (default) | scalar
-%
-%   'GammaMinBound' -- Lower bound for 'gamma_min' search.
-%                      0 (default)| scalar
+%   'GammaMinSamples' -- Number of partitions to sample at each iteration
+%                        when estimating 'gamma_min' (see 'gammaRange' for
+%                        more details)
+%                        10 (default)| scalar
 %
 %
 % Output Arguments
@@ -76,18 +73,15 @@ checkFunction=@(x) isa(x,'function_handle');
 addParameter(parseArgs,'Optimizer',@(B) iterated_genlouvain(B,[],0,1,...
     'moverandw'),checkFunction);
 addParameter(parseArgs,'Modularity',@modularity,checkFunction)
-addParameter(parseArgs,'Accuracy',1/n,@(x) isnumeric(x) && isscalar(x))
-addParameter(parseArgs,'GammaMinBound',0,@(x) isnumeric(x) && isscalar(x))
+addParameter(parseArgs,'GammaMinSamples',10,@(x) isnumeric(x) && isscalar(x))
 
 parse(parseArgs,varargin{:});
 
-accuracy=parseArgs.Results.Accuracy;
 mod_fun=parseArgs.Results.Modularity;
 optimizer=parseArgs.Results.Optimizer;
-bound=parseArgs.Results.GammaMinBound;
+gmin_samples=parseArgs.Results.GammaMinSamples;
 
-[gamma_min, gamma_max]=gammaRange(A,accuracy,'modularity',mod_fun,...
-    'GammaMinBound',bound);
+[gamma_min, ~]=gammaRange(A,'Modularity',mod_fun,'Samples',gmin_samples);
 
 P=modularity(A,1);
 A=(A+A')./2;
@@ -125,7 +119,7 @@ g_sample=g_sample(b_red);
 Pp=Pp(b_red);
 Ap=Ap(b_red);
 
-% avoid outputting NaN for largest of value of gamma due to numerical error
+% avoid outputting NaN for largest value of gamma due to numerical error
 % and 'next' Interpolant not supporting extrapolation
 if b_sample(end)<1
     b_sample(end+1)=1;

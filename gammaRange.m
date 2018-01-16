@@ -1,10 +1,10 @@
-function [gamma_min,gamma_max]=gammaRange(A,accuracy,varargin)
-% gammaRange Compute range of gamma values.
+function [gamma_min,gamma_max]=gammaRange(A,varargin)
+% gammaRange Compute range of gamma values. 
 %
 % Syntax
 %__________________________________________________________________________
 %
-%   [gamma_min,gamma_max]=gammaRange(A,accuracy)
+%   [gamma_min,gamma_max]=gammaRange(A)
 %
 %   [gamma_min,gamma_max]=gammaRange(__,Name,Value)
 %
@@ -12,8 +12,8 @@ function [gamma_min,gamma_max]=gammaRange(A,accuracy,varargin)
 % Description
 %__________________________________________________________________________
 %
-%   [gamma_min,gamma_max]=gammaRange(A,accuracy) computes range of 'gamma'
-%       values with given accuracy.
+%   [gamma_min,gamma_max]=gammaRange(A) computes range of 'gamma'
+%       values that result in non-trivial partitions.
 %
 %   [gamma_min,gamma_max]=gammaRange(__,Name,Value) additionally customizes 
 %       the behavior of the function by e.g. using a different algorithm to
@@ -25,8 +25,6 @@ function [gamma_min,gamma_max]=gammaRange(A,accuracy,varargin)
 %__________________________________________________________________________
 %
 %   A -- Adjacency matrix of the network
-%
-%   accuracy -- Accuracy for the bisection search to compute 'gamma_min'.
 %
 %
 % Name-Value Pair Arguments
@@ -43,22 +41,47 @@ function [gamma_min,gamma_max]=gammaRange(A,accuracy,varargin)
 %   'Modularity' -- Function to compute modularity matrix of the form
 %                   'B=modularity(A,gamma)' where 'A' is an adjacency
 %                   matrix and 'gamma' is a resolution parameter. Note that
-%                   the function assumes that 'B=(A+A')/2-gamma*P' for some matrix
-%                   'P'.
+%                   the function assumes that 'B=(A+A')/2-gamma*P' for some
+%                   matrix 'P'.
 %                   @modularity (default) | function handle
 %
-%   'GammaMinBound' -- Lower bound for 'gamma_min' search. 
-%                      0 (default)| scalar
+%   'InitialGuess' -- Initial value for 'gamma_min' search. 
+%                      1 (default)| scalar
+%
+%   'Samples' -- Number of partitions to sample to test for 'gamma_min' at
+%                proposed value. More samples should result in more
+%                accurate values. 
 %
 %
 % Output Arguments
 %__________________________________________________________________________
 %
-%   gamma_min -- Smallest value of 'gamma' for which the network splits
-%                into communities.
+%   gamma_min -- Upper bound for smallest value of 'gamma' for which the 
+%                network splits into communities.
 %
 %   gamma_max -- Smallest value of 'gamma' for which the network is split
 %                into singleton communities.
+%
+%
+% Implementation
+%__________________________________________________________________________
+%
+% 'gamma_max' is simply the largest value of gamma for which there exist
+% ferromagnetic interactions in the modularity matrix and is easy to
+% compute directly based on the adjacency and modularity matrix. 
+%
+% 'gamma_min' does not have a closed-form solution and needs to be
+% approximated numerically. This function uses an iterative algorithm that
+% exploits the linearity of modularity as a function of gamma for a fixed
+% partition. This means that we can directly compute the minimum value of
+% gamma for which a given partition is better than the trivial partition.
+% The iterative algorithm proceeds by first estimating 'gamma_min' using a
+% small sample of partitions. We then sample a new set of patitions using
+% 'gamma=gamma_min-epsilon' (to ensure the previous partitions are strictly
+% non-optimal) and use the new sample to update 'gamma_min' and repeat. The
+% algorithm stops once the new sample consists only of the trivial
+% partition.
+%
 %
 % See Also eventSamples, exponentialSamples, hierarchicalConsensus
 
@@ -71,51 +94,56 @@ parseArgs=inputParser();
 checkFunction=@(x) isa(x,'function_handle');
 addParameter(parseArgs,'Optimizer',@(B) iterated_genlouvain(B,[],0,1,...
     'moverandw'),checkFunction);
-addParameter(parseArgs,'Modularity',@modularity,checkFunction)
-addParameter(parseArgs,'GammaMinBound',0,@(x) isnumeric(x) && isscalar(x))
+addParameter(parseArgs,'Modularity',@modularity,checkFunction);
+addParameter(parseArgs,'InitialGuess',1,@(x) isnumeric(x) && isscalar(x));
+addParameter(parseArgs,'Samples',10,@(x) isnumeric(x) && isscalar(x));
 
 parse(parseArgs,varargin{:});
 
 mod_fun=parseArgs.Results.Modularity;
 optimizer=parseArgs.Results.Optimizer;
-bound=parseArgs.Results.GammaMinBound;
+initial_guess=parseArgs.Results.InitialGuess;
+samples=parseArgs.Results.Samples;
 
 A=sparse(A);
-nc_min=nComponents(A);
-n=length(A);
 % find smallest value of gamma necessary to make all interactions negative
-gamma_max=max(max(div_0((A+A')/2,((A+A')/2-modularity(A,1)))));
+AT=(A+A')/2;
+PT=AT-modularity(A,1);
+gamma_max=max(max(div_0(AT,PT)));
+NUM_TOL=10^-9; % small constant used to ensure that already sampled partitions are strictly non-optimal at the next iteration.
 
-% bisection search to find gamma_min
-a=bound;
-b=1;
-check=@(gamma) max(optimizer(mod_fun(A,gamma)))>nc_min;
-while ~check(b)
-    b=2*b;
-end
-if check(a)
-    gamma_min=a;
+% make sure initial guess is valid
+B0=mod_fun(A,0);
+if any(B0(:)<=0)
+    S0=optimizer(B0);
+    G=sparse(1:length(S0),S0,1);
+    a0=trace(G'*AT*G);
+    p0=trace(G'*PT*G);
 else
-    while b-a>accuracy
-        mid=(a+b)/2;
-        if check(mid)
-            b=mid;
-        else
-            a=mid;
-        end
+    a0=sum(sum(AT));
+    p0=sum(sum(PT));
+end
+gamma_min=inf;
+while gamma_min>=inf
+    parfor i=1:samples
+        S(:,i)=optimizer(mod_fun(A,initial_guess-NUM_TOL));
     end
-    gamma_min=b;
+    gamma_min=gamma_min_bound(AT,PT,S,a0,p0);
+    initial_guess=min(2*initial_guess,gamma_max-NUM_TOL);
+end
+% update using convex hull idea
+gamma_min_new=gamma_min;
+gamma_min=inf;
+while gamma_min_new<gamma_min
+    gamma_min=gamma_min_new;
+    parfor i=1:samples
+        S(:,i)=optimizer(mod_fun(A,gamma_min-NUM_TOL));
+    end
+    gamma_min_new=gamma_min_bound(AT,PT,S,a0,p0);
 end
 
-% avoid sparse output
 gamma_min=full(gamma_min);
 gamma_max=full(gamma_max);
-end
-
-function c=nComponents(A)
-% use dmperm to find the number of weakly connected components
-[~,~,r,~]=dmperm(spones(A+A')+speye(length(A)));
-c=length(r)-1;
 end
 
 function A=div_0(A,B)
@@ -123,3 +151,17 @@ function A=div_0(A,B)
 ind=find(A);
 A(ind)=A(ind)./B(ind);
 end
+
+function gamma_min=gamma_min_bound(A,P,S,a0,p0)
+    gamma_min=inf;
+    for i=1:size(S,2)
+        [u,~,e]=unique(S(:,i));
+        if numel(u)>1
+            G=sparse(1:size(S,1),e,1,size(S,1),numel(u));
+            a=trace(G'*A*G);
+            p=trace(G'*P*G);
+            gamma_min=min(gamma_min,(a0-a)/(p0-p));
+        end
+    end
+end
+        
