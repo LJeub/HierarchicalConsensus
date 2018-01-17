@@ -33,18 +33,17 @@ function C=coclassificationMatrix(S)
 % Author: Lucas Jeub
 % Email: ljeub@iu.edu
 
-% identify unique rows
 [N,L]=size(S);
-[ur,~,ri]=unique(S,'rows');
-Cr=zeros(size(ur,1));
-
-% compute scores
-for i=1:size(ur,1)
-    Cr(i,:)=sum(bsxfun(@eq,ur(i,:),ur),2)/L;
+% reduce to unique rows
+[S,~,ri]=unique(S,'rows');
+E=sparse(1:N,ri,1);
+% construct node-to-cluster adjacency matrix
+row=repmat(1:size(S,1),1,L);
+for i=2:L
+    S(:,i)=S(:,i)+max(S(:,i-1));
 end
-
-% expand
-G=sparse(1:N,ri,1);
-C=G*Cr*G';
-
+G=sparse(row,S(:),1);
+% compute coclassification matrix
+C=E*(G*G')*E';
+C=full(C)./L;
 end
