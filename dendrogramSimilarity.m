@@ -102,6 +102,12 @@ function [Tree,isConsistent]=dendrogramSimilarity(C,Sc,Tree,varargin)
 % Author: Lucas Jeub
 % Email: ljeub@iu.edu
 
+isConsistent=true;
+if isempty(Tree)
+    % Don't do anything if tree is empty
+    return
+end
+
 parseArgs=inputParser();
 addParameter(parseArgs,'SimilarityFunction','mean');
 addParameter(parseArgs,'SimilarityType','all',@(x) ismember(x,{'all','linkage'}))
@@ -124,7 +130,7 @@ else
 end
 type=parseArgs.Results.SimilarityType;
 
-isConsistent=true;
+
 [merges,~,index]=unique(Tree(:,1));
 Tree(:,3)=0;
 for i=numel(merges):-1:1
