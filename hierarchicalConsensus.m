@@ -182,9 +182,9 @@ while coms_new~=coms
             if max(Sc_it)>1
                 Sc(ind)=Sc_it+coms;
                 c_it=max(Sc_it);
-
+                val=mean(mean(A(ind,ind)));
                 % update tree
-                Tree(end+(1:c_it),:)=[repmat(i,c_it,1),coms+(1:c_it)'];
+                Tree(end+(1:c_it),:)=[repmat(i,c_it,1),coms+(1:c_it)',repmat(val,c_it,1)];
                 coms=coms+c_it;
                 mydisp(sprintf('split com %u into %u coms',i-coms_old,max(Sc_it)))
             end
