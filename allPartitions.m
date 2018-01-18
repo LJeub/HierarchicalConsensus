@@ -54,7 +54,7 @@ else
         Sc=merge(Sc,Tree(i:end,:));
         skipped = isequal(Sc,Sall(:,end));
         if ~isequal(Tree(i+1,1),com) && ~skipped
-            if p(end)<Tree(i+1,3)
+            if p(end)>Tree(i+1,3)
                 Sall(:,end+1)=Sc;
                 p(end+1)=Tree(i+1,3);
             else
