@@ -28,8 +28,8 @@ function C=coclassificationMatrix(S)
 %
 % See also hierarchicalConsensus
 
-% Version: 1.1-alpha1
-% Date: Tue Jan 16 18:15:01 EST 2018
+% Version: 1.1
+% Date: Tue 30 Jan 2018 18:22:37 EST
 % Author: Lucas Jeub
 % Email: ljeub@iu.edu
 
