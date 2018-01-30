@@ -108,7 +108,7 @@ samples=parseArgs.Results.Samples;
 A=sparse(A);
 % find smallest value of gamma necessary to make all interactions negative
 AT=(A+A')/2;
-PT=AT-modularity(A,1);
+PT=AT-mod_fun(A,1);
 gamma_max=max(max(div_0(AT,PT)));
 NUM_TOL=10^-9; % small constant used to ensure that already sampled partitions are strictly non-optimal at the next iteration.
 
