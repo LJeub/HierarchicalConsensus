@@ -22,10 +22,7 @@ function [Sall,thresholds]=allPartitions(Sc,Tree)
 %           larger-scale clusters. 'Tree' is an edge list, where
 %           'Tree(i,1)' is the index of the coarser cluster, 'Tree(i,2)' is
 %           the index of the finer cluster to be merged and 'Tree(i,3)' is
-%           a measure of similarity between the clusters to be merged. (In
-%           the case of a tree obtained from 'hierarchicalConsensus' this
-%           is the average value of the null matrix used to split the
-%           clusters.
+%           a measure of similarity between the clusters to be merged.
 %
 % Output Arguments
 %__________________________________________________________________________
