@@ -1,15 +1,15 @@
-function [Sall,p]=allPartitions(Sc,Tree)
+function [Sall,thresholds]=allPartitions(Sc,Tree)
 % allPartitions Find all cuts of a consensus tree
 %
 % Syntax
 %__________________________________________________________________________
 %
-%   [Sall,p]=allPartitions(Sc,Tree)
+%   [Sall,thresholds]=allPartitions(Sc,Tree)
 %
 % Description
 %__________________________________________________________________________
 %
-%   [Sall,p]=allPartitions(Sc,Tree) computes all cuts of a hierarchical
+%   [Sall,thresholds]=allPartitions(Sc,Tree) computes all cuts of a hierarchical
 %       tree (e.g. based the output of hierarchicalConsensus).
 %
 % Input Arguments
@@ -33,7 +33,7 @@ function [Sall,p]=allPartitions(Sc,Tree)
 %   Sall -- All partitions obtained by cuts of the hierarchy given as a
 %           matrix
 %
-%   p -- The values of the similarity between clusters merged in Sall
+%   thresholds -- The values of the similarity between clusters merged in Sall
 %
 % See also hierarchicalConsensus
 
@@ -44,31 +44,31 @@ function [Sall,p]=allPartitions(Sc,Tree)
 
 if isempty(Tree)
     Sall=Sc;
-    p=0;
+    thresholds=0;
 else
     Tree=sort_tree(Tree);
     Sall=Sc;
-    p(1)=Tree(1,3);
+    thresholds(1)=Tree(1,3);
     com=Tree(1,1);
     for i=1:size(Tree,1)-1
         Sc=merge(Sc,Tree(i:end,:));
         skipped = isequal(Sc,Sall(:,end));
         if ~isequal(Tree(i+1,1),com) && ~skipped
-            if p(end)>Tree(i+1,3)
+            if thresholds(end)>Tree(i+1,3)
                 Sall(:,end+1)=Sc;
-                p(end+1)=Tree(i+1,3);
+                thresholds(end+1)=Tree(i+1,3);
             else
                 warning('Similarity weakly inconsistent with hierarchy, a level has been collapsed')
             end
             com=Tree(i+1,1);
         end
         if skipped
-            p(end)=Tree(i+1,3);
+            thresholds(end)=Tree(i+1,3);
         end
     end
     Sc=merge(Sc,Tree(end,:));
     Sall(:,end+1)=Sc;
-    p(end+1)=0;
+    thresholds(end+1)=0;
 end
 
 end
