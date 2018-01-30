@@ -1,5 +1,5 @@
 function [gamma_min,gamma_max]=gammaRange(A,varargin)
-% gammaRange Compute range of gamma values. 
+% gammaRange Compute range of gamma values.
 %
 % Syntax
 %__________________________________________________________________________
@@ -15,7 +15,7 @@ function [gamma_min,gamma_max]=gammaRange(A,varargin)
 %   [gamma_min,gamma_max]=gammaRange(A) computes range of 'gamma'
 %       values that result in non-trivial partitions.
 %
-%   [gamma_min,gamma_max]=gammaRange(__,Name,Value) additionally customizes 
+%   [gamma_min,gamma_max]=gammaRange(__,Name,Value) additionally customizes
 %       the behavior of the function by e.g. using a different algorithm to
 %       optimize modularity or using a different modularity-like quality
 %       function.
@@ -33,9 +33,9 @@ function [gamma_min,gamma_max]=gammaRange(A,varargin)
 % Parameter names can be abbreviated and are not case sensitive.
 %
 %   'Optimizer' -- Function for finding "optimal" partitions for a
-%                  modularity-like quality function with modularity matrix 
+%                  modularity-like quality function with modularity matrix
 %                  'B'.
-%                  @(B) iterated_genlouvain(B,[],0,1,'moverandw') (default) | 
+%                  @(B) iterated_genlouvain(B,[],0,1,'moverandw') (default) |
 %                  function handle
 %
 %   'Modularity' -- Function to compute modularity matrix of the form
@@ -45,18 +45,18 @@ function [gamma_min,gamma_max]=gammaRange(A,varargin)
 %                   matrix 'P'.
 %                   @modularity (default) | function handle
 %
-%   'InitialGuess' -- Initial value for 'gamma_min' search. 
+%   'InitialGuess' -- Initial value for 'gamma_min' search.
 %                      1 (default)| scalar
 %
 %   'Samples' -- Number of partitions to sample to test for 'gamma_min' at
 %                proposed value. More samples should result in more
-%                accurate values. 
+%                accurate values.
 %
 %
 % Output Arguments
 %__________________________________________________________________________
 %
-%   gamma_min -- Upper bound for smallest value of 'gamma' for which the 
+%   gamma_min -- Upper bound for smallest value of 'gamma' for which the
 %                network splits into communities.
 %
 %   gamma_max -- Smallest value of 'gamma' for which the network is split
@@ -68,7 +68,7 @@ function [gamma_min,gamma_max]=gammaRange(A,varargin)
 %
 % 'gamma_max' is simply the largest value of gamma for which there exist
 % ferromagnetic interactions in the modularity matrix and is easy to
-% compute directly based on the adjacency and modularity matrix. 
+% compute directly based on the adjacency and modularity matrix.
 %
 % 'gamma_min' does not have a closed-form solution and needs to be
 % approximated numerically. This function uses an iterative algorithm that
@@ -104,25 +104,23 @@ mod_fun=parseArgs.Results.Modularity;
 optimizer=parseArgs.Results.Optimizer;
 initial_guess=parseArgs.Results.InitialGuess;
 samples=parseArgs.Results.Samples;
+NUM_TOL=10^-9; % small constant used to ensure that already sampled partitions are strictly non-optimal at the next iteration.
 
 A=sparse(A);
 % find smallest value of gamma necessary to make all interactions negative
 AT=(A+A')/2;
 PT=AT-mod_fun(A,1);
 gamma_max=max(max(div_0(AT,PT)));
-NUM_TOL=10^-9; % small constant used to ensure that already sampled partitions are strictly non-optimal at the next iteration.
+
+% compute partition for gamma=0 to handle the case where the network is not
+% connected
+B0=mod_fun(A,0);
+S0=optimizer(B0);
+G=sparse(1:length(S0),S0,1);
+a0=trace(G'*AT*G);
+p0=trace(G'*PT*G);
 
 % make sure initial guess is valid
-B0=mod_fun(A,0);
-if any(B0(:)<=0)
-    S0=optimizer(B0);
-    G=sparse(1:length(S0),S0,1);
-    a0=trace(G'*AT*G);
-    p0=trace(G'*PT*G);
-else
-    a0=sum(sum(AT));
-    p0=sum(sum(PT));
-end
 gamma_min=inf;
 while gamma_min>=inf
     parfor i=1:samples
@@ -130,7 +128,11 @@ while gamma_min>=inf
     end
     gamma_min=gamma_min_bound(AT,PT,S,a0,p0);
     initial_guess=min(2*initial_guess,gamma_max-NUM_TOL);
+    if gamma_min>=inf
+        warning('initial guess for ''gamma_min'' did not split the network')
+    end
 end
+
 % update using convex hull idea
 gamma_min_new=gamma_min;
 gamma_min=inf;
@@ -153,15 +155,15 @@ A(ind)=A(ind)./B(ind);
 end
 
 function gamma_min=gamma_min_bound(A,P,S,a0,p0)
-    gamma_min=inf;
-    for i=1:size(S,2)
-        [u,~,e]=unique(S(:,i));
-        if numel(u)>1
-            G=sparse(1:size(S,1),e,1,size(S,1),numel(u));
-            a=trace(G'*A*G);
-            p=trace(G'*P*G);
-            gamma_min=min(gamma_min,(a0-a)/(p0-p));
-        end
+gamma_min=inf;
+for i=1:size(S,2)
+    [u,~,e]=unique(S(:,i));
+    if numel(u)>1
+        G=sparse(1:size(S,1),e,1,size(S,1),numel(u));
+        a=trace(G'*A*G);
+        p=trace(G'*P*G);
+        gamma_min=min(gamma_min,(a0-a)/(p0-p));
     end
 end
-        
+end
+
