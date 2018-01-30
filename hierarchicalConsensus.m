@@ -18,12 +18,12 @@ function [Sc,Tree]=hierarchicalConsensus(Ssample,varargin)
 %   [Sc,Tree]=hierarchicalConsensus(Ssample) returns the final consensus
 %       partition and consensus tree for significance level 'alpha=0.05'.
 %
-%   [Sc,Tree]=hierarchicalConsensus(Ssample,alpha) returns the final 
+%   [Sc,Tree]=hierarchicalConsensus(Ssample,alpha) returns the final
 %       consensus partition and consensus tree for significance level
 %       'alpha'.
 %
 %   [Sc,Tree]=hierarchicalConsensus(__,Name,Value) additionally customizes
-%       the behavior of the function using 'Name','Value' pair arguments. 
+%       the behavior of the function using 'Name','Value' pair arguments.
 %
 %
 % Input Arguments
@@ -32,12 +32,12 @@ function [Sc,Tree]=hierarchicalConsensus(Ssample,varargin)
 %   Ssample -- Ensemble of input partitions given as a matrix where each
 %              column encodes a partition.
 %              matrix
-%   
+%
 %   alpha -- Significance level for testing whether a pair of nodes is
-%            significantly less frequently co-assigned than would be 
+%            significantly less frequently co-assigned than would be
 %            expected by chance.
 %            0 <= alpha <= 1 (default: alpha=0.05)
-%                           
+%
 %
 % Name-Value Pair Arguments
 %__________________________________________________________________________
@@ -57,7 +57,7 @@ function [Sc,Tree]=hierarchicalConsensus(Ssample,varargin)
 %                true (default) | false
 %
 %   'NullModel' -- Function handle to null model to use for the
-%                  co-assignment matrix. 
+%                  co-assignment matrix.
 %                  @localPermModel (default) | @permModel | ...
 %
 %   'PoissBinApprox' -- Function for approximating the quantiles of the
@@ -67,8 +67,39 @@ function [Sc,Tree]=hierarchicalConsensus(Ssample,varargin)
 %   'Optimizer' -- Function for finding "optimal" partitions for a
 %                  modularity-like quality function with modularity matrix
 %                  'B'
-%                  @(B) iterated_genlouvain(B,[],0,1,'moverandw') (default) | 
+%                  @(B) iterated_genlouvain(B,[],0,1,'moverandw') (default) |
 %                  function handle
+%
+%   'SimilarityFunction' -- Specify function used to summarize entries of
+%                           the coclassification matrix into a single
+%                           similarity value:
+%
+%                               'mean' (default) -- use mean value
+%
+%                               'min' -- use minimum value
+%
+%                               function handle -- supply a custom function
+%                           
+%
+%   'SimilarityType' -- Specify which entries of the coclassification
+%                       matrix to use to compute the similarity value:
+%
+%                           'all' (default) -- use all entries for nodes in
+%                                              the cluster
+%
+%                           'linkage' -- use only entries between nodes in
+%                                        different subclusters, e.g. only 
+%                                        the entries marked with 'y' in the
+%                                        example below:
+%
+%                                           1 | x x x y y y y y
+%                                           1 | x x x y y y y y
+%                                           1 | x x x y y y y y
+%                                           2 | y y y x x y y y
+%                                           2 | y y y x x y y y
+%                                           3 | y y y y y x x x
+%                                           3 | y y y y y x x x
+%                                           3 | y y y y y x x x
 %
 %
 % Output Arguments
@@ -81,7 +112,7 @@ function [Sc,Tree]=hierarchicalConsensus(Ssample,varargin)
 %           reconstruct coarser clusters. Tree is a matrix where each row
 %           represents an edge of the tree. The first element of a row
 %           gives the index of the coarse cluster that the finer cluster
-%           given by the second element is merged into. 
+%           given by the second element is merged into.
 %           matrix (m x 2)
 %
 % See Also eventSamples, drawHierarchy, consensusPlot, coclassificationMatrix,
@@ -105,10 +136,12 @@ addParameter(parseArgs,'Optimizer',@(B) iterated_genlouvain(B,[],0,1,...
 addParameter(parseArgs,'Iterations',L,@(x) isnumeric(x) && isscalar(x));
 addParameter(parseArgs,'Verbose',true,@islogical);
 addParameter(parseArgs,'CoclassificationMatrix',[],@(x) ismatrix(x))
+addParameter(parseArgs,'SimilarityFunction','mean');
+addParameter(parseArgs,'SimilarityType','all',@(x) ismember(x,{'all','linkage'}))
 
 parse(parseArgs,Ssample,varargin{:});
 
-NUM_TOL=10^-10; 
+NUM_TOL=10^-10;
 % constant used in genlouvain for selecting positive moves. This value is
 % added to the null model to avoid splitting a pair of nodes that is
 % co-classified exactly as many times as expected
@@ -135,9 +168,25 @@ null_dist=parseArgs.Results.NullModel;
 poiss_bin_approx=parseArgs.Results.PoissBinApprox;
 n_iter=parseArgs.Results.Iterations;
 optimizer=parseArgs.Results.Optimizer;
+funInput=parseArgs.Results.SimilarityFunction;
+if ischar(funInput)
+    switch funInput
+        case 'mean'
+            simfun=@mean;
+        case {'min','minimum'}
+            simfun=@min;
+        otherwise
+            error('unknown Function %s',funInput);
+    end
+elseif isa(funInput,'function_handle')
+    simfun=funInput;
+else
+    error('Function input must be string or function handle');
+end
+simtype=parseArgs.Results.SimilarityType;
 delete(parseArgs);
 
-Tree=[];
+Tree=zeros(0,3);
 Sc=ones(N,1);
 coms_old=0;
 coms_new=0;
@@ -159,7 +208,7 @@ while coms_new~=coms
                     'increase ensemble size or reduce significance level '...
                     'for meaningful results']);
             end
-            B=A_it-p+2*NUM_TOL; 
+            B=A_it-p+2*NUM_TOL;
             while true
                 if any(B(:)<=0)
                     Sc_it=zeros(length(B),n_iter);
@@ -178,11 +227,25 @@ while coms_new~=coms
                     break;
                 end
             end
-
+            
             if max(Sc_it)>1
                 Sc(ind)=Sc_it+coms;
                 c_it=max(Sc_it);
-                val=mean(mean(A(ind,ind)));
+                Cit=A(ind,ind);
+                switch simtype
+                    case 'linkage'
+                        mask=bsxfun(@ne,Sc_it,Sc_it');
+                        val=Cit(mask);
+                    case 'all'
+                        val=Cit(:);
+                    otherwise
+                        error('Unknown similarity type');
+                end
+                val=simfun(val);
+                if any(val<=Tree(Tree(:,2)==i,3))
+                    warning('Similarity function is not consistent with Tree for group %u',i)
+                end
+
                 % update tree
                 Tree(end+(1:c_it),:)=[repmat(i,c_it,1),coms+(1:c_it)',repmat(val,c_it,1)];
                 coms=coms+c_it;
@@ -190,8 +253,8 @@ while coms_new~=coms
             end
         end
     end
-level=level+1;
-coms_old=coms_new;
+    level=level+1;
+    coms_old=coms_new;
 end
 
 end
