@@ -21,49 +21,87 @@ This section gives a brief overview of the different functions included in this 
 
 #### Generate initial ensemble
 
-To use the hierarchical consensus clustering algorithm we first need to generate an ensemble of input partitions`S`, were `S(i,t)` gives the community membership of node `i` in partition `t`.  The package includes two functions 
+To use the hierarchical consensus clustering algorithm we first need to generate an ensemble of input partitions `S`, where `S(i,t)` gives the community membership of node `i` in partition `t`.  We use `np` for the number of partitions in the ensemble. The package includes two functions 
 
-	S = eventSamples(A, np)
+```Matlab
+S = eventSamples(A, np)
 
-	S = exponentialSamples(A, np)
-	
-that compute ensembles based on multiresolution modularity. `eventSamples` implements the event sampling procedure and is usually recommended. Alternatively, one could use any other method to compute the initial ensemble. Here `np` is the number of partitions in the ensemble. 
+S = exponentialSamples(A, np)
+```
+
+that compute ensembles based on multiresolution modularity. `eventSamples` implements the event sampling procedure and is usually recommended.
+To generate an ensemble of input partitions fixing `gamma=1`, use
+
+```Matlab
+S = fixedResSamples(A, np)
+```
+
+For a different fixed resolution, use
+
+```Matlab
+S = fixedResSamples(A, np, 'Gamma', gamma)
+```
+
+Alternatively, one could use any other method to compute the initial ensemble. 
 
 #### Hierarchical Consensus Community Structure
 
 Given an initial ensemble `S` identify consensus community structure at significance level `alpha=0.05`:
 
-	[Sc, Tree] = hierarchicalConsensus(S);
+```Matlab
+[Sc, Tree] = hierarchicalConsensus(S);
+```
 
 For a different significance level `alpha` use
 
-	[Sc, Tree] = hierarchicalConsensus(S, alpha);
-	
-For more details other optional parameters see `help('hierarchicalConsensus')`.
+```Matlab
+[Sc, Tree] = hierarchicalConsensus(S, alpha);
+```
 
-Compute all cuts of the consensus hierarchy for further analysis:
-	
-	Sall = allPartitions(Sc, Tree)
+The `Tree` returned by `hierarchicalConsensus` is weighted, where the weight indicates the strength of the new cluster. This weight is used for visualizing the hierarchy and to extract partitions that are representative of different scales. By default the weight is the mean value of the coclassification matrix restricted to the nodes within the cluster. The way the weight is computed can be changed by using the options `'SimilarityFunction'` and `'SimilarityType'`. The weight has no influence on the way clusters are merged and it is possible that the weights are inconsistent with the hierarchical structure and the function issues a warning in that case. For more details and other optional parameters see `help('hierarchicalConsensus')`.
+
+To change the weights for an existing hierarchy (e.g., because the existing weights are inconsistent), use
+```Matlab
+C = coclassificationMatrix(S);
+[Tree, isConsistent] = dendrogramSimilarity(C, Sc, Tree, ...)
+```
+
+which accepts the same `'SimilarityFunction'` and `'SimilarityType'` options as `hierarchicalConsensus`. The second output argument `isConsistent` indicates if the weights are consistent with the hierarchy.
+
+To compute all cuts of the consensus hierarchy that result from cutting the dendrogram use
+
+```Matlab
+[Sall, thresholds] = allPartitions(Sc, Tree)
+```
+
+The partition `Sall(:, i)` is the result of cutting the dendrogram at any threshold `t` such that `thresholds(i-1) < t <= thresholds(i)`. 
+
 
 #### Visualize Results
 
 Plot consensus hierarchy:
-	
-	drawHierarchy(Sc, Tree)
+
+```Matlab
+drawHierarchy(Sc, Tree)
+```
 
 Also show the coclassification matrix
 
-	C = coclassificationMatrix(S);
-	consensusPlot(C, Sc, Tree)
-	
+```Matlab
+C = coclassificationMatrix(S);
+consensusPlot(C, Sc, Tree)
+```
+
 #### Generate Hierarchical Benchmark Networks
 
-Choose the fraction of edges assigned to each level of the hierarchy by specifying `p`, where `p(i)` is the fraction of edges assigned to the `i+1`th level of the hierarchy (`p(1)` is the fraction of random edges not constraint by any community structure). Note that `sum(p)==1`.
+Choose the fraction of edges assigned to each level of the hierarchy by specifying `p`, where `p(i)` is the fraction of edges assigned to the `i-1`th level of the hierarchy (`p(1)` is the fraction of random edges not constrained by any community structure). Note that `sum(p)==1`.
 
 Generate adjacency matrix `A` and ground truth partitions `Sgtruth`:
 
-	[A, Sgtruth] = hierarchicalBenchmark(n, p)
-	
+```Matlab
+[A, Sgtruth] = hierarchicalBenchmark(n, p)
+```
+
 where `n` is the number of nodes in the network. For more customization options see `help('hierarchicalBenchmark')`.
 
 
@@ -73,19 +111,26 @@ This code produces a figure that is similar to Fig. 3a of the paper.
 
 First, generate the benchmark network:
 
-	[A, Sgtruth] = hierarchicalBenchmark(1000, [0.2,0.2,0.6]);
-	
+```Matlab
+[A, Sgtruth] = hierarchicalBenchmark(1000, [0.2,0.2,0.6]);
+```
 
-Next, compute the initial ensemble with 150 partitions:
+Next, compute the initial ensemble with 1000 partitions:
 
-	S = eventSamples(A, 150);
-	
+```Matlab
+S = eventSamples(A, 1000);
+```
+
 Find hierarchical consensus community structure at significance level `alpha=0.05`:
 
-	[Sc, Tree] = hierarchicalConsensus(S);
-	
+```Matlab
+[Sc, Tree] = hierarchicalConsensus(S);
+```
+
 Plot the results:
-	
-	C = coclassificationMatrix(S);
-	
-	consensusPlot(C, Sc, Tree, 'GroundTruth', Sgtruth)
+
+```Matlab
+C = coclassificationMatrix(S);
+
+consensusPlot(C, Sc, Tree, 'GroundTruth', Sgtruth)
+```
