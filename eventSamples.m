@@ -83,7 +83,7 @@ gmin_samples=parseArgs.Results.GammaMinSamples;
 
 [gamma_min, ~]=gammaRange(A,'Modularity',mod_fun,'Samples',gmin_samples);
 
-P=modularity(A,1);
+P=mod_fun(A,1);
 A=(A+A')./2;
 P=A-P;
 N=length(A);
