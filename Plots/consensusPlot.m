@@ -56,8 +56,8 @@ function [ax_C,ax_H,order]=consensusPlot(C,Sc,Tree,varargin)
 %
 % See also hierachicalConsensus, drawHierarchy
 
-% Version: 1.1
-% Date: Tue 30 Jan 2018 18:22:37 EST
+% Version: 1.1.1
+% Date: Thu  8 Mar 2018 15:34:45 CET
 % Author: Lucas Jeub
 % Email: ljeub@iu.edu
 

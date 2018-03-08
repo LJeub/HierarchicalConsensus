@@ -63,8 +63,8 @@ function [S,gammas]=eventSamples(A,n,varargin)
 %
 % See Also hierarchicalConsensus, exponentialSamples
 
-% Version: 1.1
-% Date: Tue 30 Jan 2018 18:22:37 EST
+% Version: 1.1.1
+% Date: Thu  8 Mar 2018 15:34:46 CET
 % Author: Lucas Jeub
 % Email: ljeub@iu.edu
 

@@ -30,8 +30,8 @@ function mu=localPermModel(S)
 %
 % See Also hierarchicalConsensus, permModel, normApprox, sampleApprox
 
-% Version: 1.1
-% Date: Tue 30 Jan 2018 18:22:38 EST
+% Version: 1.1.1
+% Date: Thu  8 Mar 2018 15:34:46 CET
 % Author: Lucas Jeub
 % Email: ljeub@iu.edu
 
