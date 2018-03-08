@@ -95,7 +95,7 @@ end
 % get discrete events where interactions change sign
 gamma_et=div_0(A,P);
 [g_sample,~,ind]=unique(gamma_et);
-
+g_sample=full(g_sample);
 PS=sum(sum(P));
 AS=sum(sum(A));
 Pp=zeros(length(g_sample),1);
