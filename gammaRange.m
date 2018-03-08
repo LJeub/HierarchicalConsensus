@@ -111,10 +111,12 @@ A=sparse(A);
 AT=(A+A')/2;
 PT=AT-mod_fun(A,1);
 gamma_max=max(max(div_0(AT,PT)));
-
-% compute partition for gamma=0 to handle the case where the network is not
+% find the largest value of gamma necessary to make all interactions
+% non-negative (necessary to handle the case where A has negative entries)
+g_min=min(min(div_0(AT,PT)));
+% compute partition for gamma=g_min to handle the case where the network is not
 % connected
-B0=mod_fun(A,0);
+B0=mod_fun(A,g_min);
 S0=optimizer(B0);
 G=sparse(1:length(S0),S0,1);
 a0=trace(G'*AT*G);

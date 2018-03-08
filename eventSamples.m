@@ -91,24 +91,22 @@ for i=1:N
     A(i,i)=0;
     P(i,i)=0;
 end
-ind=find(A);
 
 % get discrete events where interactions change sign
-gamma_et=full(A(ind)./P(ind));
-[g_sample,~,ind2]=unique(gamma_et);
+gamma_et=div_0(A,P);
+[g_sample,~,ind]=unique(gamma_et);
 
 PS=sum(sum(P));
 AS=sum(sum(A));
 Pp=zeros(length(g_sample),1);
 Ap=zeros(length(g_sample),1);
 for i=1:length(g_sample)
-    Pp(i)=sum(P(ind(ind2>=i)));
-    Ap(i)=sum(A(ind(ind2>=i)));
+    Pp(i)=sum(P(ind>=i));
+    Ap(i)=sum(A(ind>=i));
 end
 
-Pp=full([PS;Pp]);
-Ap=full([AS;Ap]);
-g_sample=[0;g_sample];
+Pp=full(Pp);
+Ap=full(Ap);
 b_sample=(g_sample.*(PS-Pp)-(AS-Ap))./(g_sample.*(PS-2*Pp)+2*Ap-AS);
 b_min=(gamma_min*interp1(g_sample,PS-Pp,gamma_min,'next')-interp1(g_sample,AS-Ap,gamma_min,'next'))/...
     (gamma_min*interp1(g_sample,PS-2*Pp,gamma_min,'next')+interp1(g_sample,2*Ap-AS,gamma_min,'next'));
@@ -145,4 +143,8 @@ end
 
 end
 
-
+function A=div_0(A,B)
+% DIV_0 pointwise division such that 0/0=0
+ind=find(A);
+A(ind)=A(ind)./B(ind);
+end
